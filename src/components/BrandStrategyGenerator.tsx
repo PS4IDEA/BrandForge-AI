@@ -72,22 +72,83 @@ export default function BrandStrategyGenerator({ language, user, onDeductCredits
       <LoadingOverlay isLoading={loading} language={language} message={isAr ? 'جاري بناء الاستراتيجية...' : 'Building strategy...'} />
       <form onSubmit={handleGenerate} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input type="text" value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder={isAr ? 'اسم العلامة' : 'Brand Name'} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border rounded-xl" required />
-          <input type="text" value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder={isAr ? 'مجال العمل' : 'Industry'} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border rounded-xl" required />
+          <div>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+              {isAr ? 'اسم العلامة التجارية:' : 'Brand Name:'}
+            </label>
+            <input 
+              type="text" 
+              value={brandName} 
+              onChange={(e) => setBrandName(e.target.value)} 
+              placeholder={isAr ? 'مثال: سلة، نون، إلخ' : 'e.g. Acme Corp'} 
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all" 
+              required 
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+              {isAr ? 'مجال أو قطاع العمل:' : 'Industry / Sector:'}
+            </label>
+            <input 
+              type="text" 
+              value={industry} 
+              onChange={(e) => setIndustry(e.target.value)} 
+              placeholder={isAr ? 'مثال: التجارة الإلكترونية، الذكاء الاصطناعي' : 'e.g. E-commerce, Artificial Intelligence'} 
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all" 
+              required 
+            />
+          </div>
         </div>
-        <textarea value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} placeholder={isAr ? 'الجمهور المستهدف' : 'Target Audience'} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border rounded-xl" required />
-        <textarea value={goals} onChange={(e) => setGoals(e.target.value)} placeholder={isAr ? 'أهداف العلامة' : 'Brand Goals'} className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border rounded-xl" required />
 
-        <button type="submit" disabled={loading} className="w-full px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all">
+        <div>
+          <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+            {isAr ? 'الجمهور المستهدف بالتفصيل:' : 'Detailed Target Audience:'}
+          </label>
+          <textarea 
+            value={targetAudience} 
+            onChange={(e) => setTargetAudience(e.target.value)} 
+            placeholder={isAr ? 'صف عملائك المثاليين، احتياجاتهم وفئتهم العمرية...' : 'Describe your ideal customers, their needs, demographic traits...'} 
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all" 
+            required 
+            rows={3}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+            {isAr ? 'أهداف العلامة ورؤيتك المستقبلية:' : 'Brand Goals & Vision:'}
+          </label>
+          <textarea 
+            value={goals} 
+            onChange={(e) => setGoals(e.target.value)} 
+            placeholder={isAr ? 'ما هي الأهداف الرئيسية لعلامتك التجارية ورؤيتها في السوق؟' : 'What are the core objectives and market vision of your brand?...'} 
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-orange-500 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all" 
+            required 
+            rows={3}
+          />
+        </div>
+
+        <button type="submit" disabled={loading} className="w-full px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-md focus:ring-2 focus:ring-orange-400">
           {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
           {isAr ? 'توليد الاستراتيجية' : 'Generate Strategy'}
         </button>
       </form>
 
       {result && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-900 border rounded-3xl p-8 space-y-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{result.title}</h2>
-          <div className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{result.content}</div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-md text-slate-800 dark:text-slate-100"
+        >
+          <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
+            <span className="text-xs font-bold uppercase tracking-widest text-orange-500 dark:text-orange-400">
+              {isAr ? 'الاستراتيجية المولّدة' : 'Generated Strategy'}
+            </span>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-1">{result.title}</h2>
+          </div>
+          <div className="text-slate-800 dark:text-slate-300 leading-relaxed whitespace-pre-wrap text-base font-medium">
+            {result.content}
+          </div>
         </motion.div>
       )}
     </div>

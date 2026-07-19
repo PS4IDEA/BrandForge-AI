@@ -9,7 +9,8 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Lazy-loaded GoogleGenAI client to prevent crash if key is missing
 let aiInstance: GoogleGenAI | null = null;
@@ -1837,6 +1838,52 @@ app.post("/api/generate-brand-strategy", async (req, res) => {
     res.json({ success: true, strategy: result.parsed });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post("/api/transcribe-audio", async (req, res) => {
+  try {
+    const { audio, mimeType, language } = req.body;
+    if (!audio || !mimeType) {
+      return res.status(400).json({ success: false, error: "Missing audio or mimeType parameter" });
+    }
+
+    const ai = getAI();
+    if (!ai) {
+      return res.status(500).json({ success: false, error: "Gemini API client is not initialized. Please verify your GEMINI_API_KEY." });
+    }
+
+    // Clean up mimeType to prevent API errors with extra parameters (e.g. "audio/webm;codecs=opus" -> "audio/webm")
+    let cleanMimeType = mimeType.split(';')[0].trim();
+    // Map any non-standard browser types to standard formats if needed
+    if (cleanMimeType === "audio/x-m4a" || cleanMimeType === "audio/m4a") {
+      cleanMimeType = "audio/mp4";
+    }
+
+    const promptText = language === 'ar'
+      ? "قم بنسخ هذا التسجيل الصوتي بدقة إلى نص مكتوب باللغة العربية. اكتب النص المنسوخ فقط دون أي مقدمات أو تعليقات إضافية أو علامات اقتباس."
+      : "Accurately transcribe this audio recording into written text. Output ONLY the transcribed text without any conversational preamble, notes, metadata, or quotes.";
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          inlineData: {
+            data: audio,
+            mimeType: cleanMimeType
+          }
+        },
+        {
+          text: promptText
+        }
+      ]
+    });
+
+    const transcription = response.text?.trim() || "";
+    res.json({ success: true, transcription });
+  } catch (err: any) {
+    console.error("[Backend API] Audio transcription error:", err);
+    res.status(500).json({ success: false, error: err.message || "Failed to transcribe audio" });
   }
 });
 
